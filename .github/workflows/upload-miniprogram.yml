@@ -172,6 +172,8 @@ jobs:
           set -euo pipefail
           APPID="$(jq -r '.appid' project.config.json)"
           echo "上传目标 appid=${APPID} version=${VERSION} robot=${ROBOT}"
+          # 开发版/体验版取不到线上版本号，把本次版本注入代码（我的页版本信息）
+          node scripts/inject-build-info.js "$VERSION" "$(date +%s)"
           node node_modules/miniprogram-ci/bin/miniprogram-ci.js upload \
             --appid "$APPID" \
             --pp "$SOURCE_DIR/miniprogram" \

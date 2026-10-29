@@ -8,7 +8,7 @@
 
 - 自动：StarCicada 的 `trigger-runner.yml` 在 push main / PR / 手动触发时派发 `repository_dispatch`。
 - 手动：本仓库 Actions → 小程序代码上传 → Run workflow。
-- 每次运行都会：`npm ci` → `npm run build:npm`（重新构建 `miniprogram_npm`）→ 校验 → 上传开发版。
+- 每次运行都会：`npm ci` → `npm run build:npm`（重新构建 `miniprogram_npm`）→ 校验 → 注入版本号 → 上传开发版。
 - 版本号：push 为 `vYYYY.MM.DD-hotfix.NN`（成功后才打 tag）；PR 为 `PR #<编号>`。
 - 上传目标为开发版，不提交审核。
 
