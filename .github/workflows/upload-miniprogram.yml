@@ -98,13 +98,6 @@ jobs:
           echo "robot=$ROBOT" >> "$GITHUB_OUTPUT"
           echo "desc=$DESC" >> "$GITHUB_OUTPUT"
 
-      - name: 安装 miniprogram-ci（项目目录之外）
-        run: |
-          set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/ci"
-          npm install --prefix "$RUNNER_TEMP/ci" --no-audit --no-fund miniprogram-ci@2.1.19 less@4.1.2
-          test -x "$RUNNER_TEMP/ci/node_modules/.bin/miniprogram-ci"
-
       - name: 准备上传密钥（只写 RUNNER_TEMP）
         id: key
         env:
@@ -152,21 +145,21 @@ jobs:
           cd "$SOURCE_DIR/miniprogram"
           test -f project.config.json
           test -f app.json
-          test -d miniprogram_npm/tdesign-miniprogram
-          test -d miniprogram_npm/miniprogram-sm-crypto
           echo "安全检查通过：密钥位于项目目录之外，代码目录无密钥"
 
-      - name: 构建 miniprogram_npm（缺失时）
+      - name: 安装依赖并构建 npm 组件
         working-directory: source/miniprogram
+        env:
+          WX_PRIVATE_KEY_PATH: ${{ steps.key.outputs.path }}
         run: |
           set -euo pipefail
-          if [ ! -d miniprogram_npm/tdesign-miniprogram ]; then
-            npm install --no-audit --no-fund
-            "$RUNNER_TEMP/ci/node_modules/.bin/miniprogram-ci" pack-npm \
-              --pp "$SOURCE_DIR/miniprogram" \
-              --pkp "${{ steps.key.outputs.path }}" \
-              --appid "$(jq -r '.appid' project.config.json)"
-          fi
+          test -f package-lock.json
+          npm ci --no-audit --no-fund
+          npm run build:npm
+          npm run check:npm
+          test -d miniprogram_npm/tdesign-miniprogram
+          test -d miniprogram_npm/miniprogram-sm-crypto
+          echo "miniprogram_npm 已构建"
 
       - name: 上传小程序代码
         working-directory: source/miniprogram
@@ -179,7 +172,7 @@ jobs:
           set -euo pipefail
           APPID="$(jq -r '.appid' project.config.json)"
           echo "上传目标 appid=${APPID} version=${VERSION} robot=${ROBOT}"
-          "$RUNNER_TEMP/ci/node_modules/.bin/miniprogram-ci" upload \
+          node node_modules/miniprogram-ci/bin/miniprogram-ci.js upload \
             --appid "$APPID" \
             --pp "$SOURCE_DIR/miniprogram" \
             --pkp "$KEY_PATH" \
