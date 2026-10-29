@@ -102,7 +102,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/ci"
-          npm install --prefix "$RUNNER_TEMP/ci" --no-audit --no-fund miniprogram-ci@2.1.19
+          npm install --prefix "$RUNNER_TEMP/ci" --no-audit --no-fund miniprogram-ci@2.1.19 less@4.1.2
           test -x "$RUNNER_TEMP/ci/node_modules/.bin/miniprogram-ci"
 
       - name: 准备上传密钥（只写 RUNNER_TEMP）
