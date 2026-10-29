@@ -213,6 +213,7 @@ jobs:
 
       - name: 回写上传状态到 StarCicada
         if: always()
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.PAT }}
           RUN_ID: ${{ github.run_id }}
