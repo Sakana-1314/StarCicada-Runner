@@ -5,7 +5,7 @@ name: 小程序代码上传
 #      把当前代码上传为开发版（默认版本号 vYYYY.MM.DD-hotfix.NN，同日两位自增）。
 #   2) 自动：StarCicada 仓库的 trigger-runner.yml 在 push / PR / 手动触发时
 #      经 repository_dispatch(starcicada_miniprogram) 派发。
-#      - push：版本号 vYYYY.MM.DD-hotfix.NN，robot 1，描述取提交标题。
+#      - push：版本号 vYYYY.MM.DD-hotfix.NN，robot 2，描述取提交标题。
 #      - PR：版本号「PR #<编号>」，robot 21-30，描述固定。
 # 所有上传都只上传为开发版本，不会提交审核。
 #
@@ -25,9 +25,9 @@ on:
         default: ""
         type: string
       robot:
-        description: 机器人编号 1-30（默认 1）
+        description: 机器人编号 1-30（默认 2）
         required: false
-        default: "1"
+        default: "2"
         type: string
       desc:
         description: 版本描述
@@ -86,7 +86,7 @@ jobs:
             DESC="由 GitHub Actions 自动上传！"
           elif [ "$EVENT" = "repository_dispatch" ]; then
             VERSION="$(bash "$GITHUB_WORKSPACE/scripts/next-version.sh")"
-            ROBOT=1
+            ROBOT=2
             DESC="$(git log -1 --pretty=%s)"
           else
             VERSION="$VERSION_INPUT"
