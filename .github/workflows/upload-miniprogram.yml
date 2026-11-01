@@ -2,10 +2,10 @@ name: 小程序代码上传
 
 # 触发方式：
 #   1) 手动：本仓库 Actions 页「Run workflow」，签出 StarCicada 的 main，
-#      把当前代码上传为开发版（默认版本号 vYYYY.MM.DD-hotfix.NN，同日两位自增）。
+#      把当前代码上传为开发版（默认版本号 vYYYY.MM.DD-cicada.NN，同日两位自增）。
 #   2) 自动：StarCicada 仓库的 trigger-runner.yml 在 push / PR / 手动触发时
 #      经 repository_dispatch(starcicada_miniprogram) 派发。
-#      - push：版本号 vYYYY.MM.DD-hotfix.NN，robot 2，描述取提交标题。
+#      - push：版本号 vYYYY.MM.DD-cicada.NN，robot 2，描述取提交标题。
 #      - PR：版本号「PR #<编号>」，robot 21-30，描述固定。
 # 所有上传都只上传为开发版本，不会提交审核。
 #
