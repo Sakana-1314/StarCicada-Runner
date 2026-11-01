@@ -3,10 +3,10 @@ name: 小程序代码上传
 # 触发方式：
 #   1) 手动：本仓库 Actions 页「Run workflow」，签出 StarCicada 的 main，
 #      把当前代码上传为开发版（默认版本号 vYYYY.MM.DD-cicada.NN，同日两位自增）。
-#   2) 自动：StarCicada 仓库的 trigger-runner.yml 在 push / PR / 手动触发时
-#      经 repository_dispatch(starcicada_miniprogram) 派发。
-#      - push：版本号 vYYYY.MM.DD-cicada.NN，robot 2，描述取提交标题。
-#      - PR：版本号「PR #<编号>」，robot 21-30，描述固定。
+#   2) 自动：StarCicada 仓库的 trigger-runner.yml 在 push main / 手动触发时
+#      经 repository_dispatch(starcicada_miniprogram) 派发，
+#      版本号 vYYYY.MM.DD-cicada.NN，robot 2，描述取提交标题。
+#      PR 不派发上传，开发版只在合并进 main 后产生一次。
 # 所有上传都只上传为开发版本，不会提交审核。
 #
 # 密钥安全（重点）：
@@ -20,7 +20,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 版本号（留空则自动用 v<当天日期>-hotfix.NN）
+        description: 版本号（留空则自动用 v<当天日期>-cicada.NN）
         required: false
         default: ""
         type: string
@@ -72,19 +72,13 @@ jobs:
         id: meta
         env:
           EVENT: ${{ github.event_name }}
-          PAYLOAD_EVENT: ${{ github.event.client_payload.event_name }}
-          PR_NUMBER: ${{ github.event.client_payload.pr_number }}
           VERSION_INPUT: ${{ inputs.version }}
           ROBOT_INPUT: ${{ inputs.robot }}
           DESC_INPUT: ${{ inputs.desc }}
         run: |
           set -euo pipefail
           cd "$SOURCE_DIR"
-          if [ "$EVENT" = "repository_dispatch" ] && [ "$PAYLOAD_EVENT" = "pull_request" ]; then
-            VERSION="PR #${PR_NUMBER}"
-            ROBOT=$(( 21 + (PR_NUMBER % 10) ))
-            DESC="由 GitHub Actions 自动上传！"
-          elif [ "$EVENT" = "repository_dispatch" ]; then
+          if [ "$EVENT" = "repository_dispatch" ]; then
             VERSION="$(bash "$GITHUB_WORKSPACE/scripts/next-version.sh")"
             ROBOT=2
             DESC="$(git log -1 --pretty=%s)"
@@ -199,7 +193,7 @@ jobs:
               "static/resource/**"
 
       - name: 记录版本 tag（仅 push 自动上传）
-        if: success() && github.event_name == 'repository_dispatch' && github.event.client_payload.event_name != 'pull_request'
+        if: success() && github.event_name == 'repository_dispatch'
         env:
           VERSION: ${{ steps.meta.outputs.version }}
         run: |
